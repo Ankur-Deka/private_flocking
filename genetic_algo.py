@@ -27,7 +27,7 @@ class Flocking:
 
         timestamp = str(int(time.mktime(datetime.now().timetuple())))
 
-        os.system('python3.5 ../experiment.py --spread {} --frontness {} --sideness {} \
+        os.system('python ../experiment.py --spread {} --frontness {} --sideness {} \
         --zigzag_len 60 --zigzag_width 5 --sine_period_ratio 10 --sine_width 5 --v_leader {} \
         --leader_sep_weight {} --leader_ali_weight {} --leader_coh_weight {} --leader_sep_max_cutoff {} \
         --leader_ali_radius {} --leader_coh_radius {} --sep_weight {} --ali_weight {} \

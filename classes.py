@@ -149,6 +149,8 @@ class Flock(object):
             self.drones.append(drone)
 
         self.clock_speed = 0.0
+        self.init_settings_path = args.init_settings_path
+
         self.load_initial_state()
         self.initial_setup()
 
@@ -156,8 +158,8 @@ class Flock(object):
         self.log_data_list, self.axes, self.sorted_log_data_name_list = utils.get_log_data_list()
 
     def load_initial_state(self):
-        path = '../'
-        path = os.path.join(path, 'settings.json')
+        path = self.init_settings_path
+        print(path)
         if not os.path.exists(path):
             print('settings not available')
             sys.exit(1)
@@ -254,11 +256,13 @@ class Flock(object):
             print("Error: invalid number of drones for initialization.")
         return positions
 
-    def initial_teleport(self, pos ):
+    def initial_teleport(self, pos, height = 'ground'):
+        z_val = 0.57 if height == 'ground' else height
         for drone in self.drones:
             pose = self.client.simGetVehiclePose(vehicle_name=drone.vehicle_name)
-            pose.position.x_val += (pos[drone.index][0] - drone.origin[0])
-            pose.position.y_val += (pos[drone.index][1] - drone.origin[1])
+            pose.position.x_val = (pos[drone.index][0] - drone.origin[0])
+            pose.position.y_val = (pos[drone.index][1] - drone.origin[1])
+            pose.position.z_val = z_val
             self.client.simSetVehiclePose(pose, True, drone.vehicle_name)
         time.sleep(1)
 
@@ -295,11 +299,17 @@ class Flock(object):
 
     def initial_setup(self):
         positions = self.initialize_positions(self.flock_number, self.base_dist, self.spread)
-        self.initial_teleport(positions)
+        # self.initial_teleport(positions)
         leader_id = self.get_leader_id(positions, self.frontness, self.sideness)
         if self.preset_leader_id != -1:
             leader_id = self.preset_leader_id
         self.leader_list.append('Drone'+str(leader_id))
+
+    # def reset_positions(self):
+    #     # if height == 
+    #     positions = self.initialize_positions(self.flock_number, self.base_dist, self.spread)
+    #     self.initial_teleport(positions)
+
 
     def take_off(self):
         for vehicle_name in self.flock_list:
@@ -322,12 +332,12 @@ class Flock(object):
             f = drone.move_by_velocity(v, duration=3.0)
         f.join()
 
-    def reset(self):
+    def reset(self):    # changed the False's to True
         for drone in self.drones:
-            self.client.armDisarm(False, drone.vehicle_name)
+            self.client.armDisarm(True, drone.vehicle_name)
         self.client.reset()
         for drone in self.drones:
-            self.client.enableApiControl(False, drone.vehicle_name)
+            self.client.enableApiControl(True, drone.vehicle_name)
 
     def make_log_data_header(self, sorted_log_data_name_list, axes):
         msg = "iteration, os_timestamp"

@@ -50,10 +50,10 @@ def main():
     prob = pg.problem(genetic_algo.Flocking(path, timestamp, model))
     pop = pg.population(prob, size=10, seed=24601)
     algo = pg.algorithm(pg.sga(gen = 1, cr = .90, m = 0.02, param_s = 3,
-                               crossover = "single", mutation = "uniform", selection = "truncated"))
+                               crossover = "single", mutation = "uniform", selection = "truncated"))    #https://esa.github.io/pygmo2/algorithms.html?highlight=sga#pygmo.sga
     algo.set_verbosity(1)
 
-    for i in range(29):
+    for i in range(29): # optimization generations
         logger.info("time = %s gen = %d \n champ_f = %s \n champ_x = %s \n f_s = %s \n x_s = %s \n id_s = %s",
             str(utils.get_unix_timestamp()),
             i + 1,
@@ -62,8 +62,8 @@ def main():
             str(np.array(pop.get_f()).tolist()),
             str(np.array(pop.get_x()).tolist()),
             str(np.array(pop.get_ID()).tolist()))
-        pop = algo.evolve(pop)
-        model.online_update(path, genetic_algo.TS_LIST[-100:], input_shape, criterion, optimizer, logger, i)
+        pop = algo.evolve(pop)  # swarm update
+        model.online_update(path, genetic_algo.TS_LIST[-100:], input_shape, criterion, optimizer, logger, i)    # adversary update
         utils.save(model, os.path.join(path, 'weights.pt'))
 
 

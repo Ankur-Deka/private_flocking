@@ -10,6 +10,9 @@ from pygame.locals import *
 
 parser = argparse.ArgumentParser('flocking')
 
+# initial settings
+parser.add_argument('--init_settings_path', type=str, default='../settings.json', help='initial settings of drones')
+
 # Flock
 parser.add_argument('--flock_number', type=str, default='4', choices=['4', '5', '9', '12', '13', '16', '19', '21'])
 parser.add_argument('--drivetrain_type', type=str, default='ForwardOnly', choices=['ForwardOnly', 'MaxDegreeOfFreedom'])
@@ -103,7 +106,7 @@ def main():
     flock.take_off()
 
     #airsim.wait_key('Press any key to go to different altitudes')
-    print("Going to different altitudes")
+    print("Going to different alti tudes")
     flock.initial_altitudes()
 
     #airsim.wait_key('Press any key to start initial motion')
