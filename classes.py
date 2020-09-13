@@ -1,6 +1,7 @@
 import airsim
 import numpy as np
 import random
+import sys
 import utils
 import sys
 import json
@@ -115,7 +116,8 @@ class Drone(object):
             #print(msg)
         return self.client.moveByVelocityAsync(v[0], v[1], v[2], duration, drivetrain=self.drivetrain_type,
                                                yaw_mode=airsim.YawMode(False, 0), vehicle_name=self.vehicle_name)
-
+    def hover(self):
+        return self.client.hoverAsync()
 
     def move_on_path(self, list_path, velocity):
         vec_path = conv_to_vec_path(list_path)
@@ -130,7 +132,7 @@ class Flock(object):
         self.spread = args.spread
         self.frontness = args.frontness
         self.sideness = args.sideness
-
+        self.clock_speed = args.clock_speed
         # connect to the AirSim simulator
         client = airsim.MultirotorClient()
         client.confirmConnection()
@@ -147,6 +149,8 @@ class Flock(object):
         for i in range(self.flock_number):
             drone = Drone(client, i, args)
             self.drones.append(drone)
+            
+        self.goal_drone = Drone(client, self.flock_number, args)
 
         self.clock_speed = 0.0
         self.init_settings_path = args.init_settings_path
@@ -159,7 +163,6 @@ class Flock(object):
 
     def load_initial_state(self):
         path = self.init_settings_path
-        print(path)
         if not os.path.exists(path):
             print('settings not available')
             sys.exit(1)
@@ -294,7 +297,6 @@ class Flock(object):
             if np.linalg.norm(pos[i,:]-target) < min_distance:
                 min_distance = np.linalg.norm(pos[i,:]-target)
                 leader_id = i
-            print(np.linalg.norm(pos[i,:]-target))
         return leader_id
 
     def initial_setup(self):
@@ -314,23 +316,26 @@ class Flock(object):
     def take_off(self):
         for vehicle_name in self.flock_list:
             f = self.client.takeoffAsync(vehicle_name=vehicle_name)
-        f.join()
+        time.sleep(0.5/self.clock_speed)
+        # f.join()
 
     def initial_altitudes(self):
-        dur = 3.0
+        dur = 1.0
         for drone in self.drones:
-            rand_vz = random.uniform(-4, -2)
+            rand_vz = random.uniform(-6, -4)
             f = drone.move_by_velocity(np.array([0.0, 0.0, rand_vz]), duration=dur)
-        f.join()
+        # f.join()
+        time.sleep(dur/self.clock_speed)
         for drone in self.drones:
             f = drone.move_by_velocity(np.array([0.0, 0.0, 0.0]))
-        f.join()
+        # f.join()
+        time.sleep(0.5/self.clock_speed)
 
     def initial_speeds(self):
         for drone in self.drones:
             v = np.random.rand(3) - np.array([0.5, 0.5, 0.5])
             f = drone.move_by_velocity(v, duration=3.0)
-        f.join()
+        # f.join()
 
     def reset(self):    # changed the False's to True
         for drone in self.drones:

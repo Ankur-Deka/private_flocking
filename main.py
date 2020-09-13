@@ -1,14 +1,14 @@
 import os
 import glob
 import numpy as np
-import utils
-import torch
-import torch.nn as nn
-import torch.utils
-import torch.backends.cudnn as cudnn
-import pygmo as pg
-from model import Network
-import genetic_algo
+import utils 
+import torch 
+import torch.nn as nn 
+import torch.utils 
+import torch.backends.cudnn as cudnn 
+import pygmo as pg 
+from model import Network 
+import genetic_algo 
 from config import args
 
 device = torch.device(args.device)

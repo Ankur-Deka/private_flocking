@@ -11,7 +11,7 @@ from pygame.locals import *
 parser = argparse.ArgumentParser('flocking')
 
 # initial settings
-parser.add_argument('--init_settings_path', type=str, default='../settings.json', help='initial settings of drones')
+parser.add_argument('--init_settings_path', type=str, default='~/Documents/AirSim/settings.json', help='initial settings of drones')
 
 # Flock
 parser.add_argument('--flock_number', type=str, default='4', choices=['4', '5', '9', '12', '13', '16', '19', '21'])
